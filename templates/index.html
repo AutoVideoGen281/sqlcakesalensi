@@ -13,16 +13,13 @@
             var x = document.getElementById("eventslist");
             var y = document.getElementById("showeventbutton");
             var z = document.getElementById("addeventform");
-            var w = document.getElementById("remeventform");
             if (x.style.display === "none") {
                 x.style.display = "block";
-                w.style.display = "block";
                 z.style.display = "block";
                 y.textContent = "hide event list";
             } else {
                 x.style.display = "none";
                 z.style.display = "none";
-                w.style.display = "none";
                 y.textContent = "show event list and add event";
             }
         }
@@ -38,6 +35,12 @@
             <td>{{ id }}</td>
             <td>{{ name }}</td>
             <td>{{ date }}</td>
+            <td>
+        <form action="/deleteevent" method="post" style="display:inline;">
+            <input type="hidden" name="id" value="{{ id }}">
+            <button type="submit">Delete</button>
+        </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
@@ -46,22 +49,15 @@
         <input type="date" name="date" required>
         <button type="submit">Create Event</button>
     </form>
-        <form id="remeventform" style="display: none;" action="/deleteevent" method="post">
-        <input type="text" name="id" placeholder="Event nbr to del" required>
-        <button type="submit">Delete Event</button>
-    </form>
-
     <button id="showarticlebutton" onclick="show_article_list()">show article list and add article</button>
     <script>
         function show_article_list() {
             var x = document.getElementById("articles_list");
             var y = document.getElementById("showarticlebutton");
             var z = document.getElementById("addarticleform");
-            var w = document.getElementById("remarticleform");
             var v = document.getElementById("editarticleform");
             if (x.style.display === "none") {
                 x.style.display = "block";
-                w.style.display = "block";
                 z.style.display = "block";
                 v.style.display = "block";
                 y.textContent = "hide article list";
@@ -69,7 +65,6 @@
                 x.style.display = "none";
                 z.style.display = "none";
                 v.style.display = "none";
-                w.style.display = "none";
                 y.textContent = "show article list and add article";
             }
         }
@@ -84,11 +79,17 @@
         </tr>
         {% for id, name, categorie, prix, quantite_initiale in articles %}
         <tr>
-            <td>{{ id }}</td>
+            <td >{{ id }}</td>
             <td>{{ name }}</td>
             <td>{{ categorie }}</td>
             <td>{{ prix }}</td>
             <td>{{ quantite_initiale }}</td>
+            <td>
+            <form action="/deletearticle" method="post" style="display:inline;">
+                <input type="hidden" name="id" value="{{ id }}">
+                <button type="submit">Delete</button>
+            </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
@@ -98,10 +99,6 @@
         <input type="number" name="prix" placeholder="Article Price" required>
         <input type="number" name="quantite_initiale" placeholder="Initial Quantity" required>
         <button type="submit">Create Article</button>
-    </form>
-        <form id="remarticleform" style="display: none;" action="/deletearticle" method="post">
-        <input type="text" name="id" placeholder="Article nbr to del" required>
-        <button type="submit">Delete Article</button>
     </form>
     <form id="editarticleform" style="display: none;" action="/editarticle" method="post">
         <input type="text" name="id" placeholder="Article ID to edit" required>
