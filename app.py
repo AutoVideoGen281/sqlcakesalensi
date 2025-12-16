@@ -1,7 +1,7 @@
 from flask import Flask,render_template,request,g,redirect,url_for
 import sqlite3
 import os
-
+import time
 
 tables = ["""CREATE TABLE events(id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT,
