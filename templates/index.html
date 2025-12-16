@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cake Sale</title>
+</head>
+<body>
+    <h1>CMC Cake Sale Manager</h1>
+    <p>NSI-projet-SQL</p>
+    <button id="showeventbutton" onclick="show_event_list()">show event list and add event</button>
+    <script>
+        function show_event_list() {
+            var x = document.getElementById("events list");
+            var y = document.getElementById("showeventbutton");
+            var z = document.getElementById("addeventform");
+            var w = document.getElementById("remeventform");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+                w.style.display = "block";
+                z.style.display = "block";
+                y.textContent = "hide event list";
+            } else {
+                x.style.display = "none";
+                z.style.display = "none";
+                w.style.display = "none";
+                y.textContent = "show event list and add event";
+            }
+        }
+    </script>
+    <p id="events list" style="display: none;">{{events}}</p>
+    <form id="addeventform" style="display: none;" action="/addevent" method="post">
+        <input type="text" name="name" placeholder="Event Name" required>
+        <input type="date" name="date" required>
+        <button type="submit">Create Event</button>
+    </form>
+        <form id="remeventform" style="display: none;" action="/deleteevent" method="post">
+        <input type="text" name="id" placeholder="Event nbr to del" required>
+        <button type="submit">Delete Event</button>
+    </form>
+</body>
+</html>
