@@ -5,108 +5,98 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>CMC Cake Sale Manager</h1>
-    <p>NSI-projet-SQL</p>
-    <button id="showeventbutton" onclick="show_event_list()">show event list and add event</button>
-    <script>
-        function show_event_list() {
-            var x = document.getElementById("eventslist");
-            var y = document.getElementById("showeventbutton");
-            var z = document.getElementById("addeventform");
-            if (x.style.display === "none") {
-                x.style.display = "block";
-                z.style.display = "block";
-                y.textContent = "hide event list";
-            } else {
-                x.style.display = "none";
-                z.style.display = "none";
-                y.textContent = "show event list and add event";
-            }
-        }
-    </script>
-    <table id="eventslist" style="display:none;">
-        <tr>
-            <th>Event ID</th>
-            <th>Event Name</th>
-            <th>Event Date</th>
-        </tr>
-        {% for id, name, date in events %}
-        <tr>
-            <td>{{ id }}</td>
-            <td>{{ name }}</td>
-            <td>{{ date }}</td>
-            <td>
-        <form action="/deleteevent" method="post" style="display:inline;">
+
+<h1>CMC Cake Sale Manager</h1>
+<p>NSI – Article & Stock Manager</p>
+
+<!-- EVENTS -->
+<button onclick="toggle('events')">Show / Hide Events</button>
+
+<table id="events" style="display:none">
+<tr>
+    <th>ID</th><th>Name</th><th>Date</th><th></th>
+</tr>
+{% for id,name,date in events %}
+<tr>
+    <td>{{ id }}</td>
+    <td>{{ name }}</td>
+    <td>{{ date }}</td>
+    <td>
+        <form action="/deleteevent" method="post">
             <input type="hidden" name="id" value="{{ id }}">
-            <button type="submit">Delete</button>
+            <button>Delete</button>
         </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    <form id="addeventform" style="display: none;" action="/addevent" method="post">
-        <input type="text" name="name" placeholder="Event Name" required>
-        <input type="date" name="date" required>
-        <button type="submit">Create Event</button>
-    </form>
-    <button id="showarticlebutton" onclick="show_article_list()">show article list and add article</button>
-    <script>
-        function show_article_list() {
-            var x = document.getElementById("articles_list");
-            var y = document.getElementById("showarticlebutton");
-            var z = document.getElementById("addarticleform");
-            var v = document.getElementById("editarticleform");
-            if (x.style.display === "none") {
-                x.style.display = "block";
-                z.style.display = "block";
-                v.style.display = "block";
-                y.textContent = "hide article list";
-            } else {
-                x.style.display = "none";
-                z.style.display = "none";
-                v.style.display = "none";
-                y.textContent = "show article list and add article";
-            }
-        }
-    </script>
-        <table id="articles_list" style="display:none;">
-        <tr>
-            <th>Article ID</th>
-            <th>Article Name</th>
-            <th>Article Categorie</th>
-            <th>Article Price</th>
-            <th>Initial Quantity</th>
-        </tr>
-        {% for id, name, categorie, prix, quantite_initiale in articles %}
-        <tr>
-            <td >{{ id }}</td>
-            <td>{{ name }}</td>
-            <td>{{ categorie }}</td>
-            <td>{{ prix }}</td>
-            <td>{{ quantite_initiale }}</td>
-            <td>
-            <form action="/deletearticle" method="post" style="display:inline;">
-                <input type="hidden" name="id" value="{{ id }}">
-                <button type="submit">Delete</button>
-            </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    <form id="addarticleform" style="display: none;" action="/addarticle" method="post">
-        <input type="text" name="name" placeholder="Article Name" required>
-        <input type="text" name="categorie" placeholder="Article Categorie" required>
-        <input type="number" name="prix" placeholder="Article Price" required>
-        <input type="number" name="quantite_initiale" placeholder="Initial Quantity" required>
-        <button type="submit">Create Article</button>
-    </form>
-    <form id="editarticleform" style="display: none;" action="/editarticle" method="post">
-        <input type="text" name="id" placeholder="Article ID to edit" required>
-        <input type="text" name="name" placeholder="New Article Name" required>
-        <input type="text" name="categorie" placeholder="New Article Categorie" required>
-        <input type="number" name="prix" placeholder="New Article Price" required>
-        <input type="number" name="quantite_initiale" placeholder="New Initial Quantity" required>
-        <button type="submit">Edit Article</button>
-    </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<form action="/addevent" method="post">
+    <input name="name" placeholder="Event name" required>
+    <input type="date" name="date" required>
+    <button>Add Event</button>
+</form>
+
+<!-- ARTICLES -->
+<button onclick="toggle('articles')">Show / Hide Articles</button>
+
+<table id="articles" style="display:none">
+<tr>
+    <th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th></th>
+</tr>
+{% for id,name,categorie,prix,stock in articles %}
+<tr>
+    <td>{{ id }}</td>
+    <td>{{ name }}</td>
+    <td>{{ categorie }}</td>
+    <td>{{ prix }}</td>
+    <td>{{ stock }}</td>
+    <td>
+        <form action="/deletearticle" method="post">
+            <input type="hidden" name="id" value="{{ id }}">
+            <button>Delete</button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<form action="/addarticle" method="post">
+    <input name="name" placeholder="Name" required>
+    <input name="categorie" placeholder="Category" required>
+    <input type="number" name="prix" placeholder="Price" required>
+    <input type="number" name="quantite_initiale" placeholder="Initial stock" required>
+    <button>Add Article</button>
+</form>
+
+<form action="/editarticle" method="post">
+    <input name="id" placeholder="Article ID" required>
+    <input name="name" placeholder="New name" required>
+    <input name="categorie" placeholder="New category" required>
+    <input type="number" name="prix" placeholder="New price" required>
+    <input type="number" name="quantite_initiale" placeholder="New initial stock" required>
+    <button>Edit Article</button>
+</form>
+
+<!-- TRANSACTIONS -->
+<h2>Buy / Sell</h2>
+
+<form action="/addtransaction" method="post">
+    <input type="number" name="article_id" placeholder="Article ID" required>
+    <select name="type" required>
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+    </select>
+    <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+    <button>Add Transaction</button>
+</form>
+
+<script>
+function toggle(id){
+    let e=document.getElementById(id);
+    e.style.display = e.style.display==="none" ? "table" : "none";
+}
+</script>
+
 </body>
 </html>
