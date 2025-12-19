@@ -103,7 +103,7 @@ def addtask():
     if curs.fetchone():
         curs.execute("INSERT INTO todos (description, event_id) VALUES (?, ?)", (description, event_id))
         bd.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#todo')
 
 @app.route('/done_task', methods=['POST'])
 def done_task():
@@ -114,7 +114,7 @@ def done_task():
     if curs.fetchone():
         curs.execute("DELETE FROM todos WHERE id = ?", (task_id,))
         bd.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#todo')
 
 @app.route('/editarticle', methods=['POST'])
 def editarticle():
@@ -127,7 +127,7 @@ def editarticle():
     except ValueError:
         return redirect(url_for('index'))
     edit_article(article_id, new_name, new_categorie, new_prix, new_quantite_initiale)
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#articles')
 
 @app.route('/addevent', methods=['POST'])
 def addevent():
@@ -137,7 +137,7 @@ def addevent():
     date = request.form['date']
     curs.execute("INSERT INTO events (name, date) VALUES (?, ?)", (name, date))
     bd.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#events')
 
 @app.route('/deleteevent', methods=['POST'])
 def deleteevent():
@@ -148,7 +148,7 @@ def deleteevent():
     if curs.fetchone():
         curs.execute("DELETE FROM events WHERE id = ?", (id,))
         bd.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#events')
 
 @app.route('/addarticle', methods=['POST'])
 def addarticle():
@@ -164,7 +164,7 @@ def addarticle():
     curs.execute("INSERT INTO articles (name, categorie, prix, quantite_initiale) VALUES (?, ?, ?, ?)",
                  (name, categorie, prix, quantite_initiale))
     bd.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#articles')
 
 @app.route('/deletearticle', methods=['POST'])
 def deletearticle():
@@ -175,7 +175,7 @@ def deletearticle():
     if curs.fetchone():
         curs.execute("DELETE FROM articles WHERE id = ?", (id,))
         bd.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#articles')
 
 @app.route("/addtransaction", methods=['POST'])
 def addtransaction():
@@ -186,19 +186,19 @@ def addtransaction():
     quantity = request.form.get("quantity")
     event_id = request.form.get("event_id")
     if not article_id or not type_ or not quantity or not event_id:
-        return redirect(url_for("index"))
+        return redirect(url_for("index") + '#transa')
     try:
         article_id = int(article_id)
         event_id = int(event_id)
         quantity = int(quantity)
     except ValueError:
-        return redirect(url_for("index"))
+        return redirect(url_for("index")    + '#transa')
     cur.execute("SELECT id FROM articles WHERE id = ?", (article_id,))
     if not cur.fetchone():
         return redirect(url_for("index"))
     cur.execute("SELECT id FROM events WHERE id = ?", (event_id,))
     if not cur.fetchone():
-        return redirect(url_for("index"))
+        return redirect(url_for("index") + '#transa')
     if type_ == "sell":
         cur.execute("""
             SELECT IFNULL(a.quantite_initiale + SUM(CASE WHEN t.type='buy' THEN t.quantity WHEN t.type='sell' THEN -t.quantity END), a.quantite_initiale)
@@ -207,11 +207,11 @@ def addtransaction():
         """, (article_id,))
         stock = cur.fetchone()[0] or 0
         if quantity > stock:
-            return redirect(url_for("index"))
+            return redirect(url_for("index") + '#transa')
     cur.execute("INSERT INTO transactions (article_id, type, quantity, event_id, date) VALUES (?, ?, ?, ?, DATE('now'))",
                 (article_id, type_, quantity, event_id))
     db.commit()
-    return redirect(url_for("index"))
+    return redirect(url_for("index") + '#transa')
 
 @app.route('/getstatsforevent', methods=['POST'])
 def getstatsforevent():
@@ -221,11 +221,11 @@ def getstatsforevent():
     try:
         event_id = int(event_id)
     except ValueError:
-        return redirect(url_for('index'))
+        return redirect(url_for('index') + '#stats')
     cur.execute("SELECT name, date FROM events WHERE id = ?", (event_id,))
     event = cur.fetchone()
     if not event:
-        return redirect(url_for('index'))
+        return redirect(url_for('index') + '#stats')
     cur.execute("""
         SELECT SUM(CASE WHEN type='sell' THEN quantity ELSE 0 END),
                SUM(CASE WHEN type='buy' THEN quantity ELSE 0 END)
@@ -254,7 +254,7 @@ def getstatsforevent():
                            stats={"event_name": event[0], "event_date": event[1],
                                   "total_sold": total_sold or 0, "total_bought": total_bought or 0},
                            profit=profit,
-                           bestproducts=[{"id": r[0], "name": r[1], "quantity_sold": r[2]} for r in bestproducts])
+                           bestproducts=[{"id": r[0], "name": r[1], "quantity_sold": r[2]} for r in bestproducts]) 
 
 @app.teardown_appcontext
 def close_db(error):
