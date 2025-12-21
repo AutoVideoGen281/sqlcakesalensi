@@ -20,6 +20,7 @@ tables = [
         article_id INTEGER,
         type TEXT,
         quantity INTEGER,
+        price_s INTEGER,
         event_id INTEGER,
         date DATE,
         FOREIGN KEY(article_id) REFERENCES articles(id) ON DELETE CASCADE,
@@ -33,19 +34,13 @@ tables = [
     )"""
 ]
 
-app = Flask("app.py")
+app = Flask(__name__, template_folder="/home/nsisql/mysite/templates")
 
-if not os.path.exists('bd.db'):
-    bd = sqlite3.connect('bd.db')
-    curs = bd.cursor()
-    for table in tables:
-        curs.execute(table)
-    bd.commit()
-    bd.close()
+
 
 def get_db():
     if "db" not in g:
-        g.db = sqlite3.connect("bd.db")
+        g.db = sqlite3.connect("/home/nsisql/mysite/bd.db")
         g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
 
@@ -82,6 +77,13 @@ def edit_article(article_id, new_name, new_categorie, new_prix, new_quantite_ini
 
 @app.route('/')
 def index():
+    if not os.path.exists("/home/nsisql/mysite/bd.db"):
+        bd = sqlite3.connect("/home/nsisql/mysite/bd.db")
+        curs = bd.cursor()
+        for table in tables:
+            curs.execute(table)
+        bd.commit()
+        bd.close()
     bd = get_db()
     curs = bd.cursor()
     curs.execute("SELECT * FROM events")
@@ -184,6 +186,7 @@ def addtransaction():
     article_id = request.form.get("article_id")
     type_ = request.form.get("type")
     quantity = request.form.get("quantity")
+    price_s = request.form.get("price_s")
     event_id = request.form.get("event_id")
     if not article_id or not type_ or not quantity or not event_id:
         return redirect(url_for("index") + '#transa')
@@ -191,6 +194,7 @@ def addtransaction():
         article_id = int(article_id)
         event_id = int(event_id)
         quantity = int(quantity)
+        price_s = int(price_s)
     except ValueError:
         return redirect(url_for("index")    + '#transa')
     cur.execute("SELECT id FROM articles WHERE id = ?", (article_id,))
@@ -208,8 +212,9 @@ def addtransaction():
         stock = cur.fetchone()[0] or 0
         if quantity > stock:
             return redirect(url_for("index") + '#transa')
-    cur.execute("INSERT INTO transactions (article_id, type, quantity, event_id, date) VALUES (?, ?, ?, ?, DATE('now'))",
-                (article_id, type_, quantity, event_id))
+
+    cur.execute("INSERT INTO transactions (article_id, type, quantity, price_s,event_id, date) VALUES (?, ?, ?, ?,?, DATE('now'))",
+                    (article_id, type_, quantity,price_s, event_id))
     db.commit()
     return redirect(url_for("index") + '#transa')
 
@@ -233,9 +238,10 @@ def getstatsforevent():
     """, (event_id,))
     total_sold, total_bought = cur.fetchone()
     cur.execute("""
-        SELECT SUM(CASE WHEN t.type='sell' THEN t.quantity * a.prix ELSE 0 END) -
+        SELECT SUM(CASE WHEN t.type='sell' THEN t.quantity * t.price_s ELSE 0 END) -
                SUM(CASE WHEN t.type='buy' THEN t.quantity * a.prix ELSE 0 END)
-        FROM transactions t JOIN articles a ON a.id = t.article_id
+        FROM transactions t
+        JOIN articles a ON a.id = t.article_id
         WHERE t.event_id = ?
     """, (event_id,))
     profit = cur.fetchone()[0] or 0
@@ -254,12 +260,10 @@ def getstatsforevent():
                            stats={"event_name": event[0], "event_date": event[1],
                                   "total_sold": total_sold or 0, "total_bought": total_bought or 0},
                            profit=profit,
-                           bestproducts=[{"id": r[0], "name": r[1], "quantity_sold": r[2]} for r in bestproducts]) 
+                           bestproducts=[{"id": r[0], "name": r[1], "quantity_sold": r[2]} for r in bestproducts])
 
 @app.teardown_appcontext
 def close_db(error):
     db = g.pop("db", None)
     if db:
         db.close()
-
-app.run()
