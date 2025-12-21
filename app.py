@@ -34,13 +34,13 @@ tables = [
     )"""
 ]
 
-app = Flask(__name__, template_folder="/home/nsisql/mysite/templates")
+app = Flask(__name__)
 
 
 
 def get_db():
     if "db" not in g:
-        g.db = sqlite3.connect("/home/nsisql/mysite/bd.db")
+        g.db = sqlite3.connect("bd.db")
         g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
 
@@ -77,8 +77,8 @@ def edit_article(article_id, new_name, new_categorie, new_prix, new_quantite_ini
 
 @app.route('/')
 def index():
-    if not os.path.exists("/home/nsisql/mysite/bd.db"):
-        bd = sqlite3.connect("/home/nsisql/mysite/bd.db")
+    if not os.path.exists("bd.db"):
+        bd = sqlite3.connect("bd.db")
         curs = bd.cursor()
         for table in tables:
             curs.execute(table)
@@ -267,3 +267,5 @@ def close_db(error):
     db = g.pop("db", None)
     if db:
         db.close()
+
+app.run()
