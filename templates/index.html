@@ -97,8 +97,8 @@
         <form action="/addarticle" method="post">
             <input name="name" placeholder="Name" required>
             <input name="categorie" placeholder="Category" required>
-            <input type="number" name="prix" placeholder="Price" required>
-            <input type="number" name="quantite_initiale" placeholder="Initial stock" required>
+            <input type="number" name="prix" min="0" placeholder="Price" required>
+            <input type="number" name="quantite_initiale" min="0" placeholder="Initial stock" required>
             <button type="submit">Add Article</button>
         </form>
     </div>
@@ -113,8 +113,8 @@
             </select>
             <input name="name" placeholder="New name" required>
             <input name="categorie" placeholder="New category" required>
-            <input type="number" name="prix" placeholder="New price" required>
-            <input type="number" name="quantite_initiale" placeholder="New initial stock" required>
+            <input type="number" name="prix" min="0" placeholder="New price" required>
+            <input type="number" name="quantite_initiale" min="0" placeholder="New initial stock" required>
             <button type="submit">Edit Article</button>
         </form>
     </div>
@@ -132,8 +132,8 @@
             <option value="buy">Buy</option>
             <option value="sell">Sell</option>
         </select>
-        <input type="number" name="quantity" placeholder="Quantity" min="1" required>
-        <input type="number" name="price_s" placeholder="Sell price" min="1" required>
+        <input type="number" name="quantity" min="0" placeholder="Quantity" min="1" required>
+        <input type="number" name="price_s" min="0" placeholder="Sell price" min="1" required>
 
         <select name="event_id" required>
             {% for id,name,date in events %}
